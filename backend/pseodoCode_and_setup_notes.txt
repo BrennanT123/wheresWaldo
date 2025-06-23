@@ -1,0 +1,85 @@
+Startup
+
+getStartup
+Backend sets the session sid 
+Backend wipes the curengGame data
+Backend grabs the 3 scene urls and returns to frontend
+frontend displays the 3 scenes in a dialog box 
+
+ User picks a scene. 
+ Frontend stores the scene in the frontend game  state. This will only be used for user interface. 
+ - This game state includes character names/urls/found status, start time, incorrect guesses, score
+ Frontend sends the scene id to the backend
+
+getScene
+ Backend middlware finds the scene
+ Backend controller sets the current game scene to the selected scene
+ Backend controller grabs the 3 characters linked to the scene
+ Backend controller sends the characers images and the scene image to the frontend (may be able to use scene url on home page)
+
+ Frontend adds the 3 characters to their game state.
+ Frontened loads the scene and the 3 character images in the corner.
+
+
+ Scene loads 
+ Frontend tells the backend to set the currentGame start time
+
+Start game
+ Backend sets this time to now
+
+ Frontend sets their start time to now
+ Frontend sets the current score to 1000 (score counts down)
+ Frontend loads a timer in the corner
+
+
+ User clicks a point 
+ Frontend draws a box around selection
+ Frontend  asks what character they think they saw. Include option to cancel. 
+ User selects character
+ Frontend sends this to backend along with the coordinates they selected
+
+ Backend middleware grabs the current games scene then the scenes characters then selected character and sends to controller
+ Backend middleware determines box boundaries and sends to controller
+ Backend controller checks if character is in box
+ - If the guess is incorrect, the controller adds 1 to currentGame incorrect guesses. 
+ - The controller then sends info to frontend saying it was incorrect.
+ - The frontend then displays to the user that they were wrong and updates interface score using frontend object
+
+ - If the guess is correct, the controller changes the character to found in the DB
+ - The controller then checks to see if all of the characters were found
+    - If no, the controller returns to the frontend that information
+
+    - If yes, then the controller sets the currentgame end time to now
+    - The controller then determines the score using incorrectGuesses and start/end time
+    - The controller then tells the frontend that the game is over and their score
+
+Frontend stops timer and display dialog showing the users score and asks for name
+User then enters their name and clicks submit
+Frontend sends name to backend. 
+
+Backened then changes the session to use the new name
+Backend then grabs the currentGames scene then grabs its leaderboard then grabs the leaderboard scores
+Backened then determines the users rank and adds a row for them
+Backened then increments everyone's rank below them by 1
+Backened then sends the leaderboards  top 5 values along with the currentGames place on the leaderboard and the ranks +/- 2 from them
+
+Frontened then displays this information
+Below the leaderboard the frontend says ("Play again") which takes them to the home when they click it.
+
+
+ROUTES
+
+get startup
+setup  -- used to give the user an option for what scene to select and clear all current game data
+
+getScene
+session select -- used to get the info about the scene and setup the starting status. 
+
+postStartGame
+start  -- used to start the game
+
+postEvulateGuess
+evaluateGuess -- used to evalueate the users guess and update game state accordingly
+
+
+updateLeaderboard -- used to update the leaderboard for the scene

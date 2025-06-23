@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+}
+
+model Scene {
+  id            Int          @id @default(autoincrement())
+  characters    Characters[]
+  url           String
+  leaderBoard   LeaderBoard  @relation(fields: [leaderBoardId], references: [id])
+  leaderBoardId Int          @unique
+  CurrentGame   CurrentGame?
+}
+
+//Leaderboard of current scores. 
+model LeaderBoard {
+  id               Int                @id @default(autoincrement())
+  date             DateTime           @default(now())
+  Scene            Scene?
+  leaderBoardEntry LeaderBoardEntry[]
+}
+
+model LeaderBoardEntry {
+  id            Int         @id @default(autoincrement())
+  date          DateTime    @default(now())
+  rank          Int
+  playerName    String
+  score         Int
+  leaderboard   LeaderBoard @relation(fields: [leaderBoardId], references: [id])
+  leaderBoardId Int
+}
+
+//If a user
+model Characters {
+  id      Int     @id @default(autoincrement())
+  xPos    Int
+  yPos    Int
+  url     String
+  isFound Boolean @default(false)
+  Scene   Scene   @relation(fields: [sceneId], references: [id])
+  sceneId Int
+}
+
+//Current games score. The score is determined by how many seconds have passed/10 + number of incorrect guesses*50
+model CurrentGame {
+  id               Int @id @default(autoincrement())
+  incorrectGuesses Int @default(0)
+  score            Int @default(0)
+
+  sessionSid String  @unique
+  session    Session @relation(fields: [sessionSid], references: [sid])
+
+  startTime DateTime?
+  endTime   DateTime?
+
+  scene   Scene @relation(fields: [sceneId], references: [id])
+  sceneId Int   @unique
+}
+
+//I inclued data in here as a placeholder. Need to confirm what data needs to be stored. 
+model Session {
+  sid         String       @id
+  expiresAt   DateTime
+  name        String       @default("Enter Name")
+  CurrentGame CurrentGame?
+}
