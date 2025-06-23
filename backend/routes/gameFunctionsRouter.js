@@ -7,6 +7,7 @@ gameRouter.get("/leaderboard", gameCtrl.getLeaderboard);
 
 gameRouter.post("/evaluateGuess",gameCtrl.postEvaluateGuess);
 gameRouter.get("/setup", gameCtrl.getStartup);
+gameRouter.get("/getScenes",gameCtrl.getScenes);
 gameRouter.post("/postScene",gameCtrl.postScene);
 gameRouter.post("/startGame",gameCtrl.postStartGame);
 gameRouter.post("/endGame",gameCtrl.postEndGame);

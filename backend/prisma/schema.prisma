@@ -58,8 +58,8 @@ model CurrentGame {
   incorrectGuesses Int @default(0)
   score            Int @default(0)
 
-  sessionSid String  @unique
-  session    Session @relation(fields: [sessionSid], references: [sid])
+  sessionId String  @unique
+  session   Session @relation(fields: [sessionId], references: [id])
 
   startTime DateTime?
   endTime   DateTime?
@@ -68,10 +68,10 @@ model CurrentGame {
   sceneId Int   @unique
 }
 
-//I inclued data in here as a placeholder. Need to confirm what data needs to be stored. 
 model Session {
-  sid         String       @id
+  id          String       @id
+  sid         String       @unique
+  data        String
   expiresAt   DateTime
-  name        String       @default("Enter Name")
   CurrentGame CurrentGame?
 }

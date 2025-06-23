@@ -14,11 +14,10 @@ const prisma = new PrismaClient({
 
 export const getLeaderboard = async (req, res, next) => {
   try {
-
     const sessionId = req.sessionID;
-    
+
     let currentGame = await prisma.currentGame.findUnique({
-      where: { sessionSid: sessionId },
+      where: { sessionId: sessionId },
       include: {
         scene: {
           include: {
@@ -39,10 +38,10 @@ export const getLeaderboard = async (req, res, next) => {
       .sort((a, b) => b.score - a.score);
 
     const topFive = entries.filter((e) => e.rank <= 5);
-    
 
-
-    return res.status(200).json({ topFive: topFive, currentGameStats: currentGameStats });
+    return res
+      .status(200)
+      .json({ topFive: topFive, currentGameStats: currentGameStats });
   } catch (err) {
     if (err.code === "P2025") {
       //prisma error for "record not found"
@@ -71,6 +70,7 @@ export const getStartup = async (req, res, next) => {
       let sessionRecord = await prisma.session.create({
         data: {
           sid,
+          id: sid,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       });
@@ -78,7 +78,7 @@ export const getStartup = async (req, res, next) => {
 
     let currentGame = await prisma.currentGame.findUnique({
       where: {
-        sessionSid: sid,
+        sessionId: sid,
       },
       include: {
         scene: true,
@@ -116,7 +116,7 @@ export const postScene = async (req, res, next) => {
     //we do not set the start time until its done loading
     let currentGame = await prisma.currentGame.create({
       data: {
-        sessionSid: req.sessionID,
+        sessionId: req.sessionID,
         sceneId: parseInt(req.body.sceneid),
       },
     });
@@ -140,7 +140,7 @@ export const postEvaluateGuess = async (req, res, next) => {
   try {
     let currentGame = await prisma.currentGame.findUnique({
       where: {
-        sessionSid: req.sessionID,
+        sessionId: req.sessionID,
       },
       include: {
         scene: {
@@ -166,7 +166,7 @@ export const postEvaluateGuess = async (req, res, next) => {
     }
     await prisma.currentGame.update({
       where: {
-        sessionSid: req.sessionID,
+        sessionId: req.sessionID,
       },
       data: {
         incorrectGuesses: {
@@ -190,7 +190,7 @@ export const postStartGame = async (req, res, next) => {
   try {
     await prisma.currentGame.update({
       where: {
-        sessionSid: req.sessionID,
+        sessionId: req.sessionID,
       },
       data: {
         startTime: new Date(),
@@ -216,7 +216,7 @@ export const postEndGame = async (req, res, next) => {
   try {
     await prisma.currentGame.update({
       where: {
-        sessionSid: req.sessionID,
+        sessionId: req.sessionID,
       },
       data: {
         endTime: new Date(),
@@ -244,7 +244,7 @@ export const postUpdateLeaderBoard = [
       try {
         const sessionId = req.sessionID;
         let currentGame = await prisma.currentGame.findUnique({
-          where: { sessionSid: sessionId },
+          where: { sessionId: sessionId },
           include: {
             scene: {
               include: {
@@ -257,7 +257,7 @@ export const postUpdateLeaderBoard = [
             },
           },
         });
-        console.log("Here");
+
         let finalScore = 0;
         if (currentGame.endTime && currentGame.startTime) {
           const timeDiffSeconds =
@@ -319,12 +319,32 @@ export const deleteCurrentGame = async (req, res, next) => {
   try {
     const sessionId = req.sessionID;
     await prisma.currentGame.delete({
-      where: { sessionSid: sessionId },
+      where: { sessionId: sessionId },
     });
 
     return res.status(200).json({
       gameDeleted: true,
     });
+  } catch (err) {
+    if (err.code === "P2025") {
+      //prisma error for "record not found"
+      return res.status(404).json({ errors: [{ message: "No game found" }] });
+    }
+    return res.status(500).json({
+      msg: "Something went wrong.",
+      error: err.message,
+    });
+  }
+};
+
+export const getScenes = async (req, res, next) => {
+  try {
+    const scenes = await prisma.scene.findMany(
+      {include:
+        {characters: true}
+      }
+    );
+    return res.status(200).json({ scenes });
   } catch (err) {
     if (err.code === "P2025") {
       //prisma error for "record not found"

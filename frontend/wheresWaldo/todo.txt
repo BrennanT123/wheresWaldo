@@ -1,0 +1,5 @@
+-Finish guessing logic
+-make the game smart enough to render the current game if it exists based on the session
+-add ability to submit score
+-add ability to view leaderBoard
+-finish game loop
