@@ -14,8 +14,8 @@ function Home() {
   if (error) return <Error />;
   if (loading || !isGameRunning) return  <Loading />;
 
-  if (isGameRunning.gameRunning === true) { //you still need to add logic to start game already started
-    console.log("True");
+  if (isGameRunning.gameRunning === true) { 
+    navigate("/play");
   } else if (isGameRunning.gameRunning === false) {
     navigate("/selectScene");
   } else {

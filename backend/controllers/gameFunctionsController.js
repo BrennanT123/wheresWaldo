@@ -65,12 +65,14 @@ export const getStartup = async (req, res, next) => {
     });
 
     //Should not be needed since the prisma session store automatically does this
-    //however it was included just to be extra safe
+    //Used if i am mocknig sessions in a test env
+
     if (!sessionRecord) {
       let sessionRecord = await prisma.session.create({
         data: {
           sid,
           id: sid,
+          data: "{}",
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       });
@@ -96,6 +98,7 @@ export const getStartup = async (req, res, next) => {
       currentGame: currentGame,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({
       msg: "Something went wrong.",
       error: err.message,
@@ -103,6 +106,60 @@ export const getStartup = async (req, res, next) => {
   }
 };
 
+export const postCurrentGame = async (req, res, next) => {
+  try {
+    let isCurrentGameRunning = await prisma.currentGame.findUnique({
+      where: {
+        sessionId: req.sessionID,
+      },
+      include: {
+        scene: {
+          include: {
+            characters: true,
+          },
+        },
+        characterFinds: true,
+      },
+    });
+
+    if (isCurrentGameRunning) {
+      return res.status(200).json({
+        currentGame: isCurrentGameRunning,
+        gameAlreadyRunning: true,
+      });
+    } else {
+      //we do not set the start time until its done loading
+      let currentGame = await prisma.currentGame.create({
+        data: {
+          sessionId: req.sessionID,
+          sceneId: parseInt(req.body.sceneid),
+        },
+        include: {
+          scene: {
+            include: {
+              characters: true,
+            },
+          },
+        },
+      });
+
+      return res.status(200).json({
+        currentGame: currentGame,
+      });
+    }
+  } catch (err) {
+    if (err.code === "P2025") {
+      //prisma error for "record not found"
+      return res.status(404).json({ errors: [{ message: "No scene found" }] });
+    }
+    return res.status(500).json({
+      msg: "Something went wrong.",
+      error: err.message,
+    });
+  }
+};
+
+//Dont need this anymore since i just pass the scene from the getScenes route on the frontend
 export const postScene = async (req, res, next) => {
   try {
     let sceneSelected = await prisma.scene.findUnique({
@@ -113,6 +170,7 @@ export const postScene = async (req, res, next) => {
         characters: true,
       },
     });
+
     //we do not set the start time until its done loading
     let currentGame = await prisma.currentGame.create({
       data: {
@@ -148,22 +206,47 @@ export const postEvaluateGuess = async (req, res, next) => {
             characters: true,
           },
         },
+        characterFinds: true,
       },
     });
 
-    for (let i = 0; i < currentGame.scene.characters.length; i++) {
+    if (!currentGame) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+
+    for (let char of currentGame.scene.characters) {
       if (
-        req.body.xcord + 50 > currentGame.scene.characters[i].xPos &&
-        req.body.xcord - 50 < currentGame.scene.characters[i].xPos &&
-        req.body.ycord + 50 > currentGame.scene.characters[i].yPos &&
-        req.body.ycord - 50 < currentGame.scene.characters[i].yPos
+        req.body.xcord + 75 >= char.xPos &&
+        req.body.xcord - 75 <= char.xPos &&
+        req.body.ycord + 75 >= char.yPos &&
+        req.body.ycord - 75 <= char.yPos
       ) {
+        const alreadyFound = currentGame.characterFinds.some(
+          (found) => found.characterId === char.id
+        );
+
+        if (alreadyFound) {
+          return res.status(200).json({
+            correct: true,
+            alreadyFound: true,
+            characterFound: char.id,
+          });
+        }
+
+        await prisma.characterFound.create({
+          data: {
+            characterId: char.id,
+            currentGameId: currentGame.id,
+          },
+        });
+
         return res.status(200).json({
           correct: true,
-          characterFound: currentGame.scene.characters[i].id,
+          characterFound: char.id,
         });
       }
     }
+
     await prisma.currentGame.update({
       where: {
         sessionId: req.sessionID,
@@ -205,6 +288,41 @@ export const postStartGame = async (req, res, next) => {
       //prisma error for "record not found"
       return res.status(404).json({ errors: [{ message: "No game found" }] });
     }
+    return res.status(500).json({
+      msg: "Something went wrong.",
+      error: err.message,
+    });
+  }
+};
+
+export const getCheckEndgame = async (req, res, next) => {
+  try {
+    let currentGame = await prisma.currentGame.findUnique({
+      where: {
+        sessionId: req.sessionID,
+      },
+      include: {
+        scene: {
+          include: {
+            characters: true,
+          },
+        },
+        characterFinds: true,
+      },
+    });
+
+    if (currentGame.characterFinds.length === 3) {
+      return res.status(200).json({
+        gameOver: true,
+      });
+    } else if (currentGame.characterFinds.length <= 3) {
+      return res.status(200).json({
+        gameOver: false,
+      });
+    } else {
+      throw new Error("More than 3 characters listed as found");
+    }
+  } catch (err) {
     return res.status(500).json({
       msg: "Something went wrong.",
       error: err.message,
@@ -318,6 +436,21 @@ export const postUpdateLeaderBoard = [
 export const deleteCurrentGame = async (req, res, next) => {
   try {
     const sessionId = req.sessionID;
+
+    const game = await prisma.currentGame.findUnique({
+      where: { sessionId },
+    });
+
+    if (!game) {
+      return res.status(404).json({ errors: [{ message: "No game found" }] });
+    }
+
+    await prisma.characterFound.deleteMany({
+      where: {
+        currentGameId: game.id,
+      },
+    });
+
     await prisma.currentGame.delete({
       where: { sessionId: sessionId },
     });
@@ -330,6 +463,7 @@ export const deleteCurrentGame = async (req, res, next) => {
       //prisma error for "record not found"
       return res.status(404).json({ errors: [{ message: "No game found" }] });
     }
+    console.error(err);
     return res.status(500).json({
       msg: "Something went wrong.",
       error: err.message,
@@ -339,11 +473,9 @@ export const deleteCurrentGame = async (req, res, next) => {
 
 export const getScenes = async (req, res, next) => {
   try {
-    const scenes = await prisma.scene.findMany(
-      {include:
-        {characters: true}
-      }
-    );
+    const scenes = await prisma.scene.findMany({
+      include: { characters: true },
+    });
     return res.status(200).json({ scenes });
   } catch (err) {
     if (err.code === "P2025") {

@@ -39,18 +39,18 @@ const scene1Data = {
   url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459857/scene3_a8mhlu.jpg",
   characters: [
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 1160,
+      yPos: 830,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459858/scene3_character1_pwisy2.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 1354,
+      yPos: 270,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459858/scene3_character2_dnochp.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 600,
+      yPos: 1065,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459859/scene3_character3_mvf3fk.jpg"
     }
   ]
@@ -60,18 +60,18 @@ const scene3Data = {
   url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459854/scene1_dbe3j4.jpg",
   characters: [
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 1370,
+      yPos: 1869,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459853/scene1_character1_d2kjy9.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 1185,
+      yPos: 560,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459854/scene1_character2_b0y3n9.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 173,
+      yPos: 506,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459854/scene1_character3_cbam92.jpg"
     }
   ]
@@ -80,18 +80,18 @@ const scene2Data = {
   url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459855/scene2_wu2ajm.jpg",
   characters: [
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 100,
+      yPos: 885,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459856/scene2_character1_i8jqn4.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 1000,
+      yPos: 1826,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459856/scene2_character2_q4jszh.jpg"
     },
     {
-      xPos: 0,
-      yPos: 0,
+      xPos: 394,
+      yPos: 1346,
       url: "https://res.cloudinary.com/dgngynk3j/image/upload/v1750459857/scene2_character3_uchxbg.jpg"
     }
   ]

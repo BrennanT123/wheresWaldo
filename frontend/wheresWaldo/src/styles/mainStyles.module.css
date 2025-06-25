@@ -9,3 +9,19 @@
   font-family: "Oswald", sans-serif;
   box-sizing: border-box;
 }
+
+
+@media (min-width: 2100px)
+{
+    .websiteContainer{
+          width: 100vw;
+    }
+}
+@media (max-width:2099px){
+    .websiteContainer
+    {
+          width: fit-content;
+          overflow-x: scroll;
+    }
+    
+}

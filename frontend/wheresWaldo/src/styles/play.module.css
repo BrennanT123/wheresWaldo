@@ -1,7 +1,33 @@
 .scene {
   width: 2000px;
+  height: auto;
+  display: block;
 }
 
+
+.sceneScrollContainer {
+  height: fit-content; /* or whatever height you want */
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+}
+
+@media (min-width: 2100px)
+{
+    .sceneScrollContainer{
+          width: 100vw;
+          justify-content: center;
+    }
+}
+@media (max-width:2099px){
+    .sceneScrollContainer
+    {
+          width: fit-content;
+          overflow-x: scroll;
+    }
+    
+}
 .characterImg {
   border: 2px black solid;
   border-radius: 15px;
@@ -33,8 +59,8 @@
     position: absolute;
     border: 4px dashed red;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
     pointer-events: none;
 }
 

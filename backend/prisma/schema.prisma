@@ -20,7 +20,7 @@ model Scene {
   url           String
   leaderBoard   LeaderBoard  @relation(fields: [leaderBoardId], references: [id])
   leaderBoardId Int          @unique
-  CurrentGame   CurrentGame?
+  CurrentGame   CurrentGame[]
 }
 
 //Leaderboard of current scores. 
@@ -43,13 +43,19 @@ model LeaderBoardEntry {
 
 //If a user
 model Characters {
-  id      Int     @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   xPos    Int
   yPos    Int
   url     String
-  isFound Boolean @default(false)
-  Scene   Scene   @relation(fields: [sceneId], references: [id])
+  Scene   Scene  @relation(fields: [sceneId], references: [id])
   sceneId Int
+}
+
+model CharacterFound {
+  id            Int         @id @default(autoincrement())
+  characterId   Int
+  currentGameId Int
+  CurrentGame   CurrentGame @relation(fields: [currentGameId], references: [id])
 }
 
 //Current games score. The score is determined by how many seconds have passed/10 + number of incorrect guesses*50
@@ -58,6 +64,8 @@ model CurrentGame {
   incorrectGuesses Int @default(0)
   score            Int @default(0)
 
+  characterFinds CharacterFound[]
+
   sessionId String  @unique
   session   Session @relation(fields: [sessionId], references: [id])
 
@@ -65,7 +73,7 @@ model CurrentGame {
   endTime   DateTime?
 
   scene   Scene @relation(fields: [sceneId], references: [id])
-  sceneId Int   @unique
+  sceneId Int  
 }
 
 model Session {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { API_LINK } from "./constants";
 axios.defaults.withCredentials = true;

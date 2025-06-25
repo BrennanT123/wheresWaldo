@@ -1,52 +1,102 @@
 import { useLocation, useOutletContext } from "react-router-dom";
 import playStyles from "../styles/play.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { API_LINK } from "../utl/constants";
-
+import Loading from "./loading";
+import Error from "./error";
 API_LINK;
 function Play() {
   const location = useLocation();
-  const scene = location.state?.scene;
+  const pickedScene = location.state?.scene || null;
+  const [scene, setScene] = useState();
   const [circle, setCircle] = useState([]);
   const [guess, setGuess] = useState([]);
   const { loading, setLoading, error, setError } = useOutletContext();
 
+  const [characters, setCharacters] = useState();
+  const [charactersFound, setCharactersFound] = useState([]);
+
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  async function initializeScene() {
+    try {
+      setLoading(true);
+      const response = await axios.post(`${API_LINK}/postCurrentGame`, {
+        sceneid: pickedScene?.id || null,
+      });
+
+      const currentGame = response.data.currentGame;
+
+      if (!response.data.gameAlreadyRunning) {
+        await axios.post(`${API_LINK}/startGame`);
+      }
+      console.log(currentGame.scene);
+      setScene(currentGame.scene);
+      
+      setCharactersFound(
+        currentGame.characterFinds.map((found) => found.characterId)
+      );
+      setCharacters(currentGame.scene.characters);
+      setLoading(false);
+    } catch (err) {
+      console.error("error while starting game");
+      const messages =
+        err.response?.data?.errors?.map((e) => e.msg).join("\n") ||
+        "unexpected error occured";
+      console.log(err);
+      setError(messages);
+    }
+  }
+
+  useEffect(() => {
+    initializeScene();
+  }, []);
+
   const handleClickScene = (e) => {
-    const imageRectangle = e.target.getBoundingClientRect();
-    console.log(imageRectangle);
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
+    const img = e.target;
+    const offsetX = e.pageX - img.offsetLeft;
+    const offsetY = e.pageY - img.offsetTop;
+    const scaleX = img.naturalWidth / img.offsetWidth;
 
-    const x = e.pageX;
-    const y = e.pageY;
-    const x_guess = e.clientX - imageRectangle.left + scrollX;
-    const y_guess = e.clientY - imageRectangle.top + scrollY;
+    const scaleY = img.naturalHeight / img.offsetHeight;
+    const x_guess = Math.round(offsetX * scaleX);
+    const y_guess = Math.round(offsetY * scaleY);
+    console.log(x_guess, y_guess);
     setGuess({ x_guess, y_guess });
-
-    console.log(guess);
-    setCircle({ x, y });
+    setCircle({ x: e.pageX, y: e.pageY });
   };
 
   //Youre working on this. You need to make it so the guess is evaluated
 
   const handleClickGuess = async (e) => {
     try {
-      const scenesFromDB = await axios.post(`${API_LINK}/evaluateGuess`, {
+      console.log("x_guess:", guess.x_guess, "y_guess:", guess.y_guess);
+      const evaluatedGuess = await axios.post(`${API_LINK}/evaluateGuess`, {
         xcord: guess.x_guess,
         ycord: guess.y_guess,
       });
-      console.log(scenesFromDB);
 
       //i think the easiest thing would be to flash the screen red if youre incorrect and
       //flash it green if youre right
-      
-      if(scenesFromDB === false)
-      {
 
-      }else if(scenesFromDB === true)
-      {
-
+      if (evaluatedGuess.data.correct === false) {
+        console.log("incorrect");
+      } else if (evaluatedGuess.data.correct === true) {
+        if (evaluatedGuess.data.alreadyFound) {
+          console.log("character already found");
+        } else {
+          console.log("correct");
+          setCharactersFound([
+            ...charactersFound,
+            evaluatedGuess.data.characterFound,
+          ]);
+          const gameOverCheck = await axios.get(`${API_LINK}/checkEndgame`);
+          if (gameOverCheck.data.gameOver) {
+            setIsGameOver(true);
+            console.log("game over");
+          }
+        }
       }
       setCircle({});
       setGuess({});
@@ -66,37 +116,47 @@ function Play() {
     setCircle({});
     setGuess({});
   };
+
+  if (error) return <Error state={{ error }} />;
+  if (loading || !scene) return <Loading />;
+
   return (
     <div className={playStyles.sceneWrapper}>
       <div className={playStyles.charactersContainer}>
-        {Array.isArray(scene.characters) &&
+        {Array.isArray(characters) &&
           scene.characters.map((character) => {
             return (
               <img
                 key={character.id}
-                className={playStyles.characterImg}
+                className={`${playStyles.characterImg} ${
+                  charactersFound.includes(character.id) &&
+                  playStyles.charactersFound
+                }`}
                 src={character.url}
                 alt="Character to find"
               />
             );
           })}
       </div>
-      <img
-        src={scene.url}
-        alt="scene"
-        className={playStyles.scene}
-        onClick={handleClickScene}
-      />
+      <div className={playStyles.sceneScrollContainer}>
+        <img
+          src={scene.url}
+          alt="scene"
+          className={playStyles.scene}
+          onClick={handleClickScene}
+        />
+      </div>
       {circle.x !== undefined && circle.y !== undefined && (
         <>
           {" "}
           <div
             className={playStyles.clickCircle}
-            style={{ left: circle.x - 25 + "px", top: circle.y - 25 + "px" }}
+            style={{ left: circle.x - 75 + "px", top: circle.y - 75 + "px" }}
           ></div>
           <div
             className={playStyles.submitGuess}
-            style={{ left: circle.x + 25 + "px", top: circle.y - 100 + "px" }}
+            style={{ left: circle.x + 50 + "px", top: circle.y - 125 + "px" }}
+            onClick={handleClickGuess}
           >
             <div className={playStyles.submitYes}>Sumbit Guess</div>
             <div className={playStyles.submitNo} onClick={handleClickCancel}>
@@ -105,7 +165,9 @@ function Play() {
           </div>
         </>
       )}
-      {/* <div
+
+      {/* Old guess container for when I wanted them to have to say what character they found. 
+       <div
         className={playStyles.guessContainer}
         style={{ left: circle.x + 25 + "px", top: circle.y - 150 + "px" }}
       >

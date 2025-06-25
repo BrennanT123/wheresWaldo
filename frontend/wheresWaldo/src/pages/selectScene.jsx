@@ -8,12 +8,20 @@ import { useState } from "react";
 import { API_LINK } from "../utl/constants";
 import Loading from "./loading";
 import axios from "axios";
-import selectSceneStyles from "../styles/selectScene.module.css"
+import selectSceneStyles from "../styles/selectScene.module.css";
 
 //This page is used to select the scene that the user will be playing on
 function SelectScene() {
   const { loading, setLoading, error, setError } = useOutletContext();
   const [scenes, setScenes] = useState(null);
+  const isGameRunning = useFetchCurrentGame(setLoading, setError);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isGameRunning?.gameRunning === true) {
+      navigate("/play");
+    }
+  }, [isGameRunning, navigate]);
 
   useEffect(() => {
     setLoading(true);
@@ -39,19 +47,25 @@ function SelectScene() {
   if (error) return <Error state={{ error }} />;
   if (loading || !scenes) return <Loading />;
 
-  console.log(scenes);
-
   return (
     <>
-    <div className={selectSceneStyles.selectScenesContainer}>
+      <div className={selectSceneStyles.selectScenesContainer}>
         <h1>Select a scene</h1>
-          <div className={selectSceneStyles.scenesContainer}>
-            {Array.isArray(scenes) && scenes.map((scene) => {
-              return <Link to="/play" state={{scene}} key={scene.id}> <img src={scene.url} alt="Scene Option"  /></Link>;
+        <div className={selectSceneStyles.scenesContainer}>
+          {Array.isArray(scenes) &&
+            scenes.map((scene) => {
+              return (
+                <Link to="/play" state={{ scene }} key={scene.id}>
+                  {" "}
+                  <img src={scene.url} alt="Scene Option" />
+                </Link>
+              );
             })}
-          </div>
-          <span>All scenes found here https://www.redbubble.com/people/zurgetron/shop</span>
-    </div>
+        </div>
+        <span>
+          All scenes found here https://www.redbubble.com/people/zurgetron/shop
+        </span>
+      </div>
     </>
   );
 }
