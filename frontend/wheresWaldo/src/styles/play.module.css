@@ -40,14 +40,24 @@
 .charactersFound {
   filter: sepia(100%) hue-rotate(90deg) saturate(200%);
 }
-.charactersContainer {
-  display: flex;
-  position: fixed;
+
+.gameInfoContainer{
+      position: fixed;
   top: 20px;
   right: 20px;
   z-index: 10;
+  background-color: white;
+  border-radius: 15px;
+  padding: 5px;
 }
+.charactersContainer {
+  display: flex;
 
+}
+.incorrectGuesses
+{
+    font-size: 30px;
+}
 .screenWrapper {
   position: relative;
   width: fit-content;
@@ -109,4 +119,39 @@
 {
     background-color: rgb(255, 198, 198);
     border-radius: 15px;
+}
+
+
+
+/* Game over screen */
+
+.gameOverOverlay {
+  position: fixed;
+  top: -100%;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: slideDown 0.6s ease forwards;
+}
+
+@keyframes slideDown {
+  to {
+    top: 0;
+  }
+}
+
+.gameOverContent {
+  text-align: center;
+  padding: 4rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  font-size: 2rem;
 }

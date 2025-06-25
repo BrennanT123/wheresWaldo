@@ -13,11 +13,10 @@ function Play() {
   const [circle, setCircle] = useState([]);
   const [guess, setGuess] = useState([]);
   const { loading, setLoading, error, setError } = useOutletContext();
-
   const [characters, setCharacters] = useState();
   const [charactersFound, setCharactersFound] = useState([]);
-
   const [isGameOver, setIsGameOver] = useState(false);
+  const [incorrectGuesses, setIncorrectGuesses] = useState(0);
 
   async function initializeScene() {
     try {
@@ -33,7 +32,7 @@ function Play() {
       }
       console.log(currentGame.scene);
       setScene(currentGame.scene);
-      
+      setIncorrectGuesses(currentGame.incorrectGuesses);
       setCharactersFound(
         currentGame.characterFinds.map((found) => found.characterId)
       );
@@ -82,9 +81,11 @@ function Play() {
 
       if (evaluatedGuess.data.correct === false) {
         console.log("incorrect");
+        setIncorrectGuesses(incorrectGuesses + 1);
       } else if (evaluatedGuess.data.correct === true) {
         if (evaluatedGuess.data.alreadyFound) {
           console.log("character already found");
+          setIncorrectGuesses(incorrectGuesses + 1);
         } else {
           console.log("correct");
           setCharactersFound([
@@ -122,21 +123,34 @@ function Play() {
 
   return (
     <div className={playStyles.sceneWrapper}>
-      <div className={playStyles.charactersContainer}>
-        {Array.isArray(characters) &&
-          scene.characters.map((character) => {
-            return (
-              <img
-                key={character.id}
-                className={`${playStyles.characterImg} ${
-                  charactersFound.includes(character.id) &&
-                  playStyles.charactersFound
-                }`}
-                src={character.url}
-                alt="Character to find"
-              />
-            );
-          })}
+      {isGameOver && (
+        <div className={playStyles.gameOverOverlay}>
+          <div className={playStyles.gameOverContent}>
+            <h1>Game Over!</h1>
+            {}
+          </div>
+        </div>
+      )}
+      <div className={playStyles.gameInfoContainer}>
+        <span className={playStyles.incorrectGuesses}>
+          Incorrect Guesses: {incorrectGuesses}
+        </span>
+        <div className={playStyles.charactersContainer}>
+          {Array.isArray(characters) &&
+            scene.characters.map((character) => {
+              return (
+                <img
+                  key={character.id}
+                  className={`${playStyles.characterImg} ${
+                    charactersFound.includes(character.id) &&
+                    playStyles.charactersFound
+                  }`}
+                  src={character.url}
+                  alt="Character to find"
+                />
+              );
+            })}
+        </div>
       </div>
       <div className={playStyles.sceneScrollContainer}>
         <img

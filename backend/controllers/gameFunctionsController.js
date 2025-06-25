@@ -140,6 +140,7 @@ export const postCurrentGame = async (req, res, next) => {
               characters: true,
             },
           },
+          characterFinds: true, 
         },
       });
 
