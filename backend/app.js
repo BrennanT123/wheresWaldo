@@ -30,7 +30,7 @@ try {
 
 
 //Setup to allow API to get calls from the frontend
-
+console.log(process.env.FRONTEND_URL);
 const corsOptions = {
   origin: process.env.FRONTEND_URL, //youll need to update this when you host your website
   optionsSuccessStatus: 200,
