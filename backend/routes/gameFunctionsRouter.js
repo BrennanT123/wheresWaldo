@@ -20,7 +20,11 @@ gameRouter.get("/api/test-session", (req, res) => {
   if (!req.session.views) req.session.views = 0;
   req.session.views++;
   req.session.test = "force save";
-  res.send("Session cookie should be set now");
+
+  req.session.test = "cookie-test";
+  req.session.save(() => {
+    res.send("Session created");
+  });
 });
 
 gameRouter.get("/test-cookie", (req, res) => {
