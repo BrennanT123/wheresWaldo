@@ -1,1 +1,1 @@
-export const API_LINK = "http://localhost:3000/api"
+export const API_LINK = "whereswaldo-production-f78a.up.railway.app"
