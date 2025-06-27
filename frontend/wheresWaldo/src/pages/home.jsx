@@ -13,18 +13,7 @@ function Home() {
   const { loading, setLoading, error, setError } = useOutletContext();
   const isGameRunning = useFetchCurrentGame(setLoading, setError);
   const navigate = useNavigate();
-  useEffect(() => {
-    axios
-      .get(`${API_LINK}/api/test-session`)
-      .then((res) => {
-        console.log("Response:", res.data);
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-      });
-
-      axios.get(`${API_LINK}/test-cookie`);
-  }, []);
+  
   useEffect(() => {
     if (isGameRunning === null || loading) return;
 

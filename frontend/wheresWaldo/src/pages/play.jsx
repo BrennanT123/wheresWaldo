@@ -185,7 +185,7 @@ function Play() {
   };
 
   if (error) return <Error state={{ error }} />;
-  if (loading || !scene) return <Loading />;
+  if (loading && !scene) return <Loading />;
 
   return (
     <div className={playStyles.sceneWrapper}>

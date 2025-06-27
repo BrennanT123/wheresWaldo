@@ -63,9 +63,6 @@ export const getLeaderboard = async (req, res, next) => {
 //starts up the current game
 export const getStartup = async (req, res, next) => {
   try {
-    console.log("Frontend URL from env:", process.env.FRONTEND_URL);
-    console.log("Session data:", req.session);
-    console.log("Cookies:", req.cookies);
 
     const sid = req.sessionID;
     let sessionRecord = await prisma.session.findUnique({
