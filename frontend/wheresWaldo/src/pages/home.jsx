@@ -22,6 +22,8 @@ function Home() {
       .catch((err) => {
         console.error("Error:", err);
       });
+
+      axios.get(`${API_LINK}/test-cookie`);
   }, []);
   useEffect(() => {
     if (isGameRunning === null || loading) return;
