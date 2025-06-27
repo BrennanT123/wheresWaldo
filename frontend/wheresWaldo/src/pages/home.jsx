@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Loading from "./loading";
 import { useEffect } from "react";
 import axios from "axios";
+import { API_LINK } from "../utl/constants";
 //this page will be used to determine if a game is running. If a game is running the user will be returned to the game
 //if the page is not running then the user will be returned to the select scene page
 function Home() {
@@ -14,7 +15,7 @@ function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get("https://your-backend-domain/api/test-session")
+      .get(`${API_LINK}/api/test-session`)
       .then((res) => {
         console.log("Response:", res.data);
       })
