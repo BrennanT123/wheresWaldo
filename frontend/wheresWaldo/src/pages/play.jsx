@@ -10,10 +10,12 @@ import axios from "axios";
 import { API_LINK } from "../utl/constants";
 import Loading from "./loading";
 import Error from "./error";
-API_LINK;
+
 function Play() {
   const location = useLocation();
-  const pickedScene = location.state?.scene || null;
+  const pickedScene =
+  location.state?.scene ||
+  JSON.parse(sessionStorage.getItem("pickedScene") || "null");
   const [scene, setScene] = useState();
   const [circle, setCircle] = useState([]);
   const [guess, setGuess] = useState([]);

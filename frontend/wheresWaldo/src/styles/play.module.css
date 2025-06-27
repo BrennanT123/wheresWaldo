@@ -20,7 +20,6 @@
 }
 @media (max-width: 2099px) {
   .sceneScrollContainer {
-    width: fit-content;
     overflow-x: scroll;
   }
 }

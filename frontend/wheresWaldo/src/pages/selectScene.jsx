@@ -71,6 +71,9 @@ function SelectScene() {
                   to="/play"
                   state={{ scene }}
                   key={scene.id}
+                  onClick={() =>
+                    sessionStorage.setItem("pickedScene", JSON.stringify(scene))
+                  }
                   className={selectSceneStyles.sceneCard}
                 >
                   {" "}
