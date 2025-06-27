@@ -1,1 +1,4 @@
-export const API_LINK = "whereswaldo-production-f78a.up.railway.app"
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+
+export const API_LINK = backendUrl;
