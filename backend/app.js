@@ -106,12 +106,6 @@ app.use((req, res) => {
 });
 
 
-app.get("/api/test-session", (req, res) => {
-  if (!req.session.views) req.session.views = 0;
-  req.session.views++;
-  res.send(`You have visited this page ${req.session.views} times`);
-});
-
 
 
 

@@ -16,5 +16,12 @@ gameRouter.post("/endGame",gameCtrl.postEndGame);
 gameRouter.post("/updateLeaderboard",gameCtrl.postUpdateLeaderBoard);
 gameRouter.delete("/deleteCurrentGame",gameCtrl.deleteCurrentGame);
 gameRouter.get("/checkEndgame",gameCtrl.getCheckEndgame);
+gameRouter.get("/api/test-session", (req, res) => {
+  if (!req.session.views) req.session.views = 0;
+  req.session.views++;
+  res.send(`You have visited this page ${req.session.views} times`);
+});
+
+
 
 export default gameRouter;
