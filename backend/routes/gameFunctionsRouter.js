@@ -22,7 +22,7 @@ gameRouter.get("/api/test-session", (req, res) => {
   res.send(`You have visited this page ${req.session.views} times`);
 });
 
-app.get("/test-cookie", (req, res) => {
+gameRouter.get("/test-cookie", (req, res) => {
   res.cookie("manual-test-cookie", "12345", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

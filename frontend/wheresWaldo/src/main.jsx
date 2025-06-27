@@ -20,15 +20,13 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "selectScene", element: <SelectScene /> },
-      {path: "play", element: <Play />}
+      { path: "play", element: <Play /> },
     ],
   },
 ]);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
+    <RouterProvider router={router} />
   </StrictMode>
 );
