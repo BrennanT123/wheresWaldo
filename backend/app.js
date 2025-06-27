@@ -5,6 +5,7 @@ import { PrismaClient, Prisma } from "./generated/prisma/index.js";
 import gameRouter from "./routes/gameFunctionsRouter.js";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import cookieParser from "cookie-parser";
 
 const app = express();
 dotenv.config();
@@ -28,6 +29,7 @@ try {
   console.error("Prisma migration failed:", e);
 }
 
+app.use(cookieParser());
 //session setup
 
 //Sessionsetup
@@ -36,6 +38,7 @@ app.use(
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // ms
       secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
     },
     secret: process.env.SESSION_SECRET,
     resave: true,

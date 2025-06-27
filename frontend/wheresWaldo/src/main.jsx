@@ -8,6 +8,9 @@ import App from "./App.jsx";
 import Home from "./pages/home.jsx";
 import SelectScene from "./pages/selectScene.jsx";
 import Play from "./pages/play.jsx";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 const router = createBrowserRouter([
   {

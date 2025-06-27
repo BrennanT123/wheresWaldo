@@ -41,6 +41,7 @@ function Play() {
 
     try {
       setLoading(true);
+
       const response = await axios.post(`${API_LINK}/postCurrentGame`, {
         sceneid: pickedScene?.id || null,
       });
