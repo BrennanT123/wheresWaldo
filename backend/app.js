@@ -9,6 +9,25 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 const app = express();
 dotenv.config();
 
+//Railway db setup
+
+import { execSync } from "child_process";
+
+try {
+  if (process.env.NODE_ENV === "production") {
+    console.log("Running Prisma migration at runtime...");
+
+    if (
+      process.env.RAILWAY_STATIC_URL ||
+      process.env.NODE_ENV === "production"
+    ) {
+      execSync("npx prisma migrate deploy", { stdio: "inherit" });
+    }
+  }
+} catch (e) {
+  console.error("Prisma migration failed:", e);
+}
+
 //session setup
 
 //Sessionsetup
@@ -68,10 +87,7 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
 app.use("/api", gameRouter);
-
 
 //to help debut 404
 
@@ -79,8 +95,6 @@ app.use((req, res) => {
   console.log("404 Not Found:", req.method, req.originalUrl);
   res.status(404).json({ error: "Not Found" });
 });
-
-
 
 // Start the session
 const PORT = process.env.PORT || 3000;
