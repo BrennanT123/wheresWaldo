@@ -20,6 +20,7 @@ function SelectScene() {
   useEffect(() => {
     if (isGameRunning?.gameRunning === true) {
       navigate("/play");
+      return;
     }
   }, [isGameRunning, navigate]);
 
@@ -50,21 +51,37 @@ function SelectScene() {
   return (
     <>
       <div className={selectSceneStyles.selectScenesContainer}>
-        <h1>Select a scene</h1>
+        <h1 className={selectSceneStyles.pageTitle}>Choose Your Scene</h1>
+        <p className={selectSceneStyles.credit}>
+          Art from&nbsp;
+          <a
+            href="https://www.redbubble.com/people/zurgetron/shop"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Zurgetron on Redbubble
+          </a>
+        </p>
+
         <div className={selectSceneStyles.scenesContainer}>
           {Array.isArray(scenes) &&
             scenes.map((scene) => {
               return (
-                <Link to="/play" state={{ scene }} key={scene.id}>
+                <Link
+                  to="/play"
+                  state={{ scene }}
+                  key={scene.id}
+                  className={selectSceneStyles.sceneCard}
+                >
                   {" "}
-                  <img src={scene.url} alt="Scene Option" />
+                  <img src={scene.url} alt={`Scene ${scene.id}`} />
+                  <div className={selectSceneStyles.sceneLabel}>
+                    Scene #{scene.id}
+                  </div>
                 </Link>
               );
             })}
         </div>
-        <span>
-          All scenes found here https://www.redbubble.com/people/zurgetron/shop
-        </span>
       </div>
     </>
   );

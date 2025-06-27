@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import { useFetchCurrentGame } from "../utl/hooks";
 import { useNavigate } from "react-router-dom";
 import Loading from "./loading";
+import { useEffect } from "react";
 //this page will be used to determine if a game is running. If a game is running the user will be returned to the game
 //if the page is not running then the user will be returned to the select scene page
 function Home() {
@@ -11,16 +12,26 @@ function Home() {
   const isGameRunning = useFetchCurrentGame(setLoading, setError);
   const navigate = useNavigate();
 
-  if (error) return <Error />;
-  if (loading || !isGameRunning) return  <Loading />;
+  useEffect(() => {
+    if (isGameRunning === null || loading) return;
 
-  if (isGameRunning.gameRunning === true) { 
-    navigate("/play");
-  } else if (isGameRunning.gameRunning === false) {
-    navigate("/selectScene");
-  } else {
-    console.log("Unexpected response", isGameRunning);
+    if (isGameRunning.gameRunning === true) {
+      navigate("/play");
+    } else if (isGameRunning.gameRunning === false) {
+      navigate("/selectScene");
+    } else {
+      console.log("Unexpected response", isGameRunning);
+    }
+  }, [isGameRunning, loading, navigate]);
+
+  if (error) {
+    return <Error />;
   }
+
+  if (loading || isGameRunning === null) {
+    return <Loading />;
+  }
+
   return <span>Game check complete</span>;
 }
 

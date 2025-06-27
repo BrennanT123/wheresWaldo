@@ -10,7 +10,6 @@ function Error() {
       <main>
         <h1 className={errorStyles.errorHeader}>{error.message}</h1>
         <div className={errorStyles.linkContainer}>
-          <Link to={-1}>Go Back </Link>
           <Link to="/"> Home </Link>
         </div>
       </main>
@@ -20,7 +19,6 @@ function Error() {
     <main>
       <h1 className={errorStyles.errorHeader}>404 Page Not Found</h1>
       <div className={errorStyles.linkContainer}>
-        <Link to={-1}>Go Back </Link>
         <Link to="/"> Home </Link>
       </div>
     </main>

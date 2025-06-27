@@ -4,29 +4,25 @@
   display: block;
 }
 
-
 .sceneScrollContainer {
-  height: fit-content; /* or whatever height you want */
+  height: fit-content;
   overflow-x: auto;
   overflow-y: auto;
   position: relative;
   display: flex;
 }
 
-@media (min-width: 2100px)
-{
-    .sceneScrollContainer{
-          width: 100vw;
-          justify-content: center;
-    }
+@media (min-width: 2100px) {
+  .sceneScrollContainer {
+    width: 100vw;
+    justify-content: center;
+  }
 }
-@media (max-width:2099px){
-    .sceneScrollContainer
-    {
-          width: fit-content;
-          overflow-x: scroll;
-    }
-    
+@media (max-width: 2099px) {
+  .sceneScrollContainer {
+    width: fit-content;
+    overflow-x: scroll;
+  }
 }
 .characterImg {
   border: 2px black solid;
@@ -41,8 +37,8 @@
   filter: sepia(100%) hue-rotate(90deg) saturate(200%);
 }
 
-.gameInfoContainer{
-      position: fixed;
+.gameInfoContainer {
+  position: fixed;
   top: 20px;
   right: 20px;
   z-index: 10;
@@ -52,26 +48,22 @@
 }
 .charactersContainer {
   display: flex;
-
 }
-.incorrectGuesses
-{
-    font-size: 30px;
+.incorrectGuesses {
+  font-size: 30px;
 }
 .screenWrapper {
   position: relative;
   width: fit-content;
 }
 
-
-.clickCircle
-{
-    position: absolute;
-    border: 4px dashed red;
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    pointer-events: none;
+.clickCircle {
+  position: absolute;
+  border: 4px dashed red;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
 }
 
 .guessContainer {
@@ -82,46 +74,39 @@
   border-radius: 10px;
 }
 
-.guessContainer img:hover{
-    transform: translateY(-5px);
-    cursor: grab;
+.guessContainer img:hover {
+  transform: translateY(-5px);
+  cursor: grab;
 }
 
-.submitGuess
-{
-    display: flex;
+.submitGuess {
+  display: flex;
   position: absolute;
   z-index: 10;
 
-  border-radius: 10px; 
+  border-radius: 10px;
   width: fit-content;
   gap: 20px;
-
 }
 
-.submitGuess div
-{
-    font-size: 30px;
-    padding: 5px;
+.submitGuess div {
+  font-size: 30px;
+  padding: 5px;
 }
-.submitGuess div:hover{
-    transform: translateY(-5px);
-    cursor: grab;
-}
-
-.submitYes
-{
-    background-color: rgb(198, 255, 198);
-    border-radius: 15px;
+.submitGuess div:hover {
+  transform: translateY(-5px);
+  cursor: grab;
 }
 
-.submitNo
-{
-    background-color: rgb(255, 198, 198);
-    border-radius: 15px;
+.submitYes {
+  background-color: rgb(198, 255, 198);
+  border-radius: 15px;
 }
 
-
+.submitNo {
+  background-color: rgb(255, 198, 198);
+  border-radius: 15px;
+}
 
 /* Game over screen */
 
@@ -154,4 +139,36 @@
   backdrop-filter: blur(20px);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   font-size: 2rem;
+}
+
+.submitScoreForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nameInput {
+  width: 100%;
+  height: 5ch;
+}
+
+.submitButton {
+  background-color: rgb(219, 255, 255);
+  height: 5ch;
+  border-radius: 2ch;
+}
+.submitButton:hover {
+  background-color: rgb(219, 255, 246);
+  cursor: grab;
+}
+
+
+/* //leaderboard stuff */
+.currentPlayerRow {
+  background-color: rgb(219, 255, 246);
+  font-weight: bold;
+}
+
+.separatorRow td {
+  text-align: center;
+  font-weight: bold;
 }

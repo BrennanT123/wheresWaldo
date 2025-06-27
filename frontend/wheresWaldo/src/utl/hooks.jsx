@@ -3,8 +3,6 @@ import axios from "axios";
 import { API_LINK } from "./constants";
 axios.defaults.withCredentials = true;
 
-
-
 export const useFetchCurrentGame = (setLoading, setError) => {
   const [isGameRunning, setIsGameRunning] = useState(null);
 
@@ -12,10 +10,13 @@ export const useFetchCurrentGame = (setLoading, setError) => {
     const checkIfGameIsRunning = async () => {
       setLoading(true);
       setError(null);
+
+     
       try {
         const response = await axios.get(`${API_LINK}/setup`, {
           withCredentials: true,
         });
+     
         setIsGameRunning(response.data);
       } catch (err) {
         console.error("error during startup", err);

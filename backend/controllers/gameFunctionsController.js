@@ -3,11 +3,15 @@ import dotenv from "dotenv";
 import { validateName } from "../lib/validate.js";
 
 dotenv.config();
+const databaseUrl =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_DATABASE_URL
+    : process.env.DATABASE_URL;
 
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.TEST_DATABASE_URL,
+      url: databaseUrl,
     },
   },
 });
@@ -31,17 +35,17 @@ export const getLeaderboard = async (req, res, next) => {
       },
     });
 
-    //Probably dont need but keeping it here just incase
-    const currentGameStats = req.query.currentGameStats;
+    if (!currentGame) {
+      return res.status(404).json({ error: "Current game not found" });
+    }
+
     const entries = currentGame.scene.leaderBoard.leaderBoardEntry
       .slice()
       .sort((a, b) => b.score - a.score);
 
     const topFive = entries.filter((e) => e.rank <= 5);
 
-    return res
-      .status(200)
-      .json({ topFive: topFive, currentGameStats: currentGameStats });
+    return res.status(200).json({ topFive: topFive });
   } catch (err) {
     if (err.code === "P2025") {
       //prisma error for "record not found"
@@ -108,6 +112,16 @@ export const getStartup = async (req, res, next) => {
 
 export const postCurrentGame = async (req, res, next) => {
   try {
+    const existingSession = await prisma.session.findUnique({
+      where: { id: req.sessionID },
+    });
+
+    if (!existingSession) {
+      return res.status(200).json({
+        noSession: true,
+      });
+    }
+
     let isCurrentGameRunning = await prisma.currentGame.findUnique({
       where: {
         sessionId: req.sessionID,
@@ -127,6 +141,10 @@ export const postCurrentGame = async (req, res, next) => {
         currentGame: isCurrentGameRunning,
         gameAlreadyRunning: true,
       });
+    } else if (!req.body.sceneid) {
+      return res.status(200).json({
+        noSceneSelected: true,
+      });
     } else {
       //we do not set the start time until its done loading
       let currentGame = await prisma.currentGame.create({
@@ -140,7 +158,7 @@ export const postCurrentGame = async (req, res, next) => {
               characters: true,
             },
           },
-          characterFinds: true, 
+          characterFinds: true,
         },
       });
 
@@ -333,7 +351,7 @@ export const getCheckEndgame = async (req, res, next) => {
 
 export const postEndGame = async (req, res, next) => {
   try {
-    await prisma.currentGame.update({
+    const currentGame = await prisma.currentGame.update({
       where: {
         sessionId: req.sessionID,
       },
@@ -343,6 +361,7 @@ export const postEndGame = async (req, res, next) => {
     });
     return res.status(200).json({
       gameEnded: true,
+      currentGame,
     });
   } catch (err) {
     if (err.code === "P2025") {
@@ -381,9 +400,10 @@ export const postUpdateLeaderBoard = [
         if (currentGame.endTime && currentGame.startTime) {
           const timeDiffSeconds =
             (currentGame.endTime.getTime() - currentGame.startTime.getTime()) /
-            1000;
-          finalScore =
-            10000 - currentGame.incorrectGuesses * 50 - timeDiffSeconds;
+            100;
+          finalScore = Math.round(
+            10000 - currentGame.incorrectGuesses * 50 - timeDiffSeconds
+          );
           if (finalScore < 0) finalScore = 0;
         }
 
@@ -416,7 +436,9 @@ export const postUpdateLeaderBoard = [
           },
         });
 
-        return res.status(200).json({ rank });
+        return res
+          .status(200)
+          .json({ rank, playerName: req.body.playerName, score: finalScore });
       } catch (err) {
         console.log(err);
         if (err.code === "P2025") {
