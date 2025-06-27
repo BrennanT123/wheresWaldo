@@ -11,7 +11,6 @@ const app = express();
 dotenv.config();
 
 //Railway db setup
-
 import { execSync } from "child_process";
 
 try {
@@ -28,6 +27,25 @@ try {
 } catch (e) {
   console.error("Prisma migration failed:", e);
 }
+
+
+//Setup to allow API to get calls from the frontend
+
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, //youll need to update this when you host your website
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+//For preflight conditions
+//This is necessary for requests other than simple requests like
+// get, post or head such as delete or put.
+//app.options("*",cors(corsOptions));
+
+
+
 
 app.use(cookieParser());
 //session setup
@@ -52,20 +70,6 @@ app.use(
   })
 );
 
-//Setup to allow API to get calls from the frontend
-
-const corsOptions = {
-  origin: process.env.FRONTEND_URL, //youll need to update this when you host your website
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-//For preflight conditions
-//This is necessary for requests other than simple requests like
-// get, post or head such as delete or put.
-//app.options("*",cors(corsOptions));
 
 // JSON parsing middleware
 app.use(express.json());
