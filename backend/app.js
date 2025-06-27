@@ -8,6 +8,8 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import cookieParser from "cookie-parser";
 
 const app = express();
+app.set('trust proxy', 1);
+
 dotenv.config();
 
 //Railway db setup
