@@ -77,6 +77,7 @@ app.use(express.json());
 // Parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
+console.log(process.env.NODE_ENV);
 //To determine if environment is test environment and what db to use
 const databaseUrl =
   process.env.NODE_ENV === "test"
@@ -103,6 +104,17 @@ app.use((req, res) => {
   console.log("404 Not Found:", req.method, req.originalUrl);
   res.status(404).json({ error: "Not Found" });
 });
+
+
+app.get("/api/test-session", (req, res) => {
+  if (!req.session.views) req.session.views = 0;
+  req.session.views++;
+  res.send(`You have visited this page ${req.session.views} times`);
+});
+
+
+
+
 
 // Start the session
 const PORT = process.env.PORT || 3000;
